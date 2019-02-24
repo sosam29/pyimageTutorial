@@ -1,0 +1,12 @@
+.DS_Store
+__pycache__/
+nn/
+nncopy/.DS_Store
+nncopy/.vscode/
+nncopy/cnn/__pycache__/
+nncopy/datasets/.DS_Store
+nncopy/datasets/__pycache__/
+nncopy/preprocessing/.DS_Store
+nncopy/preprocessing/__pycache/
+**__pycache__/
+**.DS_Store
