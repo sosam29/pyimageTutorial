@@ -8,6 +8,9 @@ from keras import backend as K
 import numpy as np 
 import pandas as pd 
 from mnist import MNIST
+from keras.callbacks import EarlyStopping
+from keras.callbacks import ModelCheckpoint
+from keras.callbacks import LearningRateScheduler
 
 mndata = MNIST('/Users/samuelsonawane/Downloads/ML_TensorFlow/mnist_data_full/samples')
 
@@ -20,7 +23,9 @@ X2, y2 = mndata.load_testing()
 X = X1 + X2
 # y = np.concatenate(y1, y2)
 y = y1 + y2
-
+es = EarlyStopping(monitor="val_loss", patience=10, mode="max", min_delta=1)
+mc = ModelCheckpoint("digits.hdf5", monitor="val_loss", verbose=1)
+callback=[es, mc]
 # X = pd.concat(X1, X2)
 # y = pd.concat(y1, y2)
 
@@ -51,8 +56,8 @@ opt = SGD(lr=0.01)
 # error expected here as we need to reshape data
 model = LenNet.build(28, 28, 1, 10)
 model.compile(loss="categorical_crossentropy", metrics=["accuracy"], optimizer=opt)
-model.fit(trainX, trainY, validation_data=(testX,testY), batch_size=128, epochs=40, verbose=1)
+model.fit(trainX, trainY, validation_data=(testX,testY), batch_size=128, epochs=40, verbose=1, callbacks=callback)
 
 
-pred = model.predict(testY, batch_size=128)
+pred = model.predict(testX, batch_size=128)
 print(classification_report(testY.argmax(axis=1), pred.argmax(axis=1), target_names=[str(x) for x in lb.classes_]))
