@@ -12,10 +12,20 @@ from keras.callbacks import EarlyStopping
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import LearningRateScheduler
 
+def step_decay(epoch):
+    alphaInit=0.01
+    factor= 0.5
+    dropEvery= 5
+
+    alpha = alphaInit *(factor ** np.floor((1+epoch)/ dropEvery))
+
+    return alpha
+
 mndata = MNIST('/Users/samuelsonawane/Downloads/ML_TensorFlow/mnist_data_full/samples')
 
 X1, y1 = mndata.load_training()
 X2, y2 = mndata.load_testing()
+
 
 # y1 = np.array(y1, dtype=np.int)
 # y2 = np.array(y2, dtype=np.int)
@@ -25,7 +35,8 @@ X = X1 + X2
 y = y1 + y2
 es = EarlyStopping(monitor="val_loss", patience=10, mode="max", min_delta=1)
 mc = ModelCheckpoint("digits.hdf5", monitor="val_loss", verbose=1)
-callback=[es, mc]
+lrdecay=[LearningRateScheduler(step_decay)]
+callback=[es, mc, lrdecay]
 # X = pd.concat(X1, X2)
 # y = pd.concat(y1, y2)
 
@@ -52,7 +63,7 @@ lb = LabelBinarizer()
 trainY = lb.fit_transform(trainY)
 testY = lb.transform(testY)
 
-opt = SGD(lr=0.01)
+opt = SGD(lr=0.01, momentum=0.9 ,nesterov= True)
 # error expected here as we need to reshape data
 model = LenNet.build(28, 28, 1, 10)
 model.compile(loss="categorical_crossentropy", metrics=["accuracy"], optimizer=opt)
